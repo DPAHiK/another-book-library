@@ -1,0 +1,108 @@
+services:
+########KAFKA########
+  zookeeper:
+    container_name: ZOOKEPEER
+    image: confluentinc/cp-zookeeper:7.4.4
+    environment:
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEPEER_PORT}
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - ${ZOOKEPEER_PORT}:${ZOOKEPEER_PORT}
+  
+  kafka:
+    container_name: KAFKA
+    image: confluentinc/cp-kafka:7.4.4
+    depends_on:
+      - zookeeper
+    ports:
+      - ${KAFKA_HOST_PORT}:${KAFKA_HOST_PORT}
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:${ZOOKEPEER_PORT}
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:${KAFKA_PORT},PLAINTEXT_HOST://localhost:${KAFKA_HOST_PORT}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  kafka-ui:
+    container_name: KAFKA_UI
+    image: provectuslabs/kafka-ui:latest
+    depends_on:
+      - kafka
+    ports:
+      - 8090:8080
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:${KAFKA_PORT}
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:${ZOOKEPEER_PORT}
+
+########TRACKER########
+  # tracker:
+  #   container_name: BOOK_TRACKER
+  #   restart: always
+  #   ports:
+  #     - "8081:${TRACKER_PORT}"
+  #   build:
+  #     context: "./book-tracker-service/"
+  #     dockerfile: Dockerfile
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #    - tracker_db
+  #    - kafka
+  #   environment:
+  #     - SERVER_PORT= ${TRACKER_PORT}
+  #     - SPRING_DATASOURCE_URL=jdbc:mysql://tracker_db/${TRACKER_DB_NAME}
+
+  # tracker_db:
+  #   image: mysql
+  #   container_name: MYSQL_BOOK_TRACKER
+  #   ports:
+  #     - '3306:${TRACKER_DB_PORT}'
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: ${ROOT_MYSQL_PASS}
+  #     MYSQL_DATABASE: ${TRACKER_DB_NAME}
+  #     MYSQL_USER: ${TRACKER_DB_USER}
+  #     MYSQL_PASSWORD: ${TRACKER_DB_PASS}
+  #   volumes:
+  #     - tracker_data:/var/lib/mysql/
+
+########STORAGE########
+
+  storage:
+    container_name: BOOK_STORAGE
+    restart: always
+    ports:
+      - "8080:${STORAGE_PORT}"
+    build:
+      context: "./book-storage-service/"
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    depends_on:
+     - storage_db
+     - kafka
+    environment:
+      - SERVER_PORT= ${STORAGE_PORT}
+      - SPRING_DATASOURCE_URL=jdbc:mysql://storage_db/${STORAGE_DB_NAME}
+
+  storage_db:
+    image: mysql
+    container_name: MYSQL_BOOK_STORAGE
+    ports:
+      - '3307:${STORAGE_DB_PORT}'
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ROOT_MYSQL_PASS}
+      MYSQL_DATABASE: ${STORAGE_DB_NAME}
+      MYSQL_USER: ${STORAGE_DB_USER}
+      MYSQL_PASSWORD: ${STORAGE_DB_PASS}
+    volumes:
+      - storage_data:/var/lib/mysql/
+      
+volumes:
+  tracker_data:
+  storage_data:
