@@ -11,10 +11,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.book_storage_service.dto.BookAddRequest;
+import com.example.book_storage_service.dto.BookEditRequest;
 import com.example.book_storage_service.dto.ResponseHandler;
 import com.example.book_storage_service.models.Book;
 import com.example.book_storage_service.services.BookService;
 import com.example.book_storage_service.services.ProducerService;
+
+import jakarta.validation.Valid;
 
 
 @RestController
@@ -46,18 +50,16 @@ public class BookController {
         return ResponseHandler.generateResponse(HttpStatus.OK, "data", book);
     }
 
-    @PostMapping("/book") //TODO: dto для post
-    public ResponseEntity<?> addBook(@RequestBody Book book){
-        bookService.addBook(book);
-        producerService.sendBookId("add-book-topic", book.getId().toString()); // TODO: сделать enum для topic
-        return ResponseHandler.generateResponse(HttpStatus.OK, "message", "Book added");
+    @PostMapping("/book")
+    public ResponseEntity<?> addBook(@RequestBody @Valid BookAddRequest book){
+        Book result = bookService.addBook(book);
+        producerService.sendBookId("add-book-topic", result.getId().toString()); // TODO: сделать enum для topic
+        return ResponseHandler.generateResponse(HttpStatus.OK, "message", "Book added (id: " + result.getId() +")");
     }
 
-    @PutMapping("/book/{id}") //TODO: dto для put
-    public ResponseEntity<?> editBook(@RequestBody Book book, @PathVariable(value = "id") Long id){
-
+    @PutMapping("/book/{id}")
+    public ResponseEntity<?> editBook(@RequestBody @Valid BookEditRequest book, @PathVariable(value = "id") Long id){
         bookService.editBook(id, book);
-
         return ResponseHandler.generateResponse(HttpStatus.OK, "message", "Book with id " + id + " edited");
     }
 

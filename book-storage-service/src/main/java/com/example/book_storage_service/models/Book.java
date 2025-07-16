@@ -108,6 +108,16 @@ public class Book {
             return this;
         }
 
+        public builder author(String author) {
+            this.author = author;
+            return this;
+        }
+
+        public builder description(String description) {
+            this.description = description;
+            return this;
+        }
+
         public Book build(){
             return new Book(this);
         }
