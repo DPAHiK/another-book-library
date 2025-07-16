@@ -38,14 +38,12 @@ public class BookController {
     public ResponseEntity<?> bookByID(@PathVariable(value = "id") Long id){
         Book book = bookService.bookById(id);
         return ResponseHandler.generateResponse(HttpStatus.OK, "data", book);
-        //return ResponseHandler.generateResponse(HttpStatus.NOT_FOUND, "message", "Book with id " + id + " not found");
     }
 
     @GetMapping("/book/isbn/{isbn}")
     public ResponseEntity<?> bookByIsbn(@PathVariable(value = "isbn") String isbn){
         Book book = bookService.bookByIsbn(isbn);
         return ResponseHandler.generateResponse(HttpStatus.OK, "data", book);
-        //return ResponseHandler.generateResponse(HttpStatus.NOT_FOUND, "message", "Book with ISBN " + isbn + " not found");
     }
 
     @PostMapping("/book") //TODO: dto для post
