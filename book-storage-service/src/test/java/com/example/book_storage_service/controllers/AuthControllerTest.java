@@ -1,133 +1,80 @@
 package com.example.book_storage_service.controllers;
 
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.example.book_storage_service.models.User;
-import com.example.book_storage_service.services.UserService;
+import com.example.book_storage_service.dto.JwtAuthenticationResponse;
+import com.example.book_storage_service.dto.LoginRequest;
+import com.example.book_storage_service.services.AuthenticationService;
 
-@ExtendWith(MockitoExtension.class)
-public class AuthControllerTest {
+class AuthControllerTest {
 
     @Mock
-    private UserService userService;
-
-    @Mock
-    private PasswordEncoder passwordEncoder;
+    private AuthenticationService authenticationService;
 
     @InjectMocks
     private AuthController authController;
 
     private MockMvc mockMvc;
-    private User user;
 
-    // @BeforeEach
-    // void setUp() {
-    //     mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
+    @BeforeEach
+    @SuppressWarnings("unused")
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
+    }
 
-    //     user = new User();
-    //     user.setId(1L);
-    //     user.setName("testUser");
-    //     user.setPassword("encodedPassword");
-    // }
+    @Test
+    void signUp_ValidRequest_ReturnsJwtResponse() throws Exception {
+        // Arrange
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUsername("testuser");
+        loginRequest.setPassword("password");
 
-    // @Test
-    // void testLogin_Success() throws Exception {
+        JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse();
+        jwtResponse.setToken("jwt.token.here");
 
-    //     when(userService.userByName(anyString())).thenReturn(Optional.of(user));
-    //     when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+        when(authenticationService.signUp(any(LoginRequest.class))).thenReturn(jwtResponse);
 
-    //     mockMvc.perform(post("/auth/login")
-    //                     .contentType(MediaType.APPLICATION_JSON)
-    //                     .content("{\"username\":\"testUser\",\"password\":\"password\"}"))
-    //             .andExpect(status().isOk())
-    //             .andExpect(jsonPath("$.token", is(notNullValue())));
+        // Act & Assert
+        mockMvc.perform(post("/auth/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"testuser\",\"password\":\"password\"}"))
+                .andExpect(status().isOk());
 
-    //     verify(authTokenRepository, times(1)).save(any(AuthToken.class));
-    // }
+        verify(authenticationService, times(1)).signUp(any(LoginRequest.class));
+    }
 
-    // @Test
-    // void testLogin_UserNotFound() throws Exception {
+    @Test
+    void signIn_ValidRequest_ReturnsJwtResponse() throws Exception {
+        // Arrange
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUsername("testuser");
+        loginRequest.setPassword("password");
 
-    //     when(userService.userByName(anyString())).thenReturn(Optional.empty());
+        JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse();
+        jwtResponse.setToken("jwt.token.here");
 
-    //     mockMvc.perform(post("/auth/login")
-    //                     .contentType(MediaType.APPLICATION_JSON)
-    //                     .content("{\"username\":\"unknownUser\",\"password\":\"password\"}"))
-    //             .andExpect(status().isUnauthorized())
-    //             .andExpect(content().string("{\"status\":401,\"message\":\"Incorrect login or password\"}"));
+        when(authenticationService.signIn(any(LoginRequest.class))).thenReturn(jwtResponse);
 
-    //     verify(authTokenRepository, times(0)).save(any(AuthToken.class));
-    // }
+        // Act & Assert
+        mockMvc.perform(post("/auth/signin")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"testuser\",\"password\":\"password\"}"))
+                .andExpect(status().isOk());
 
-    // @Test
-    // void testLogin_IncorrectPassword() throws Exception {
-
-    //     when(userService.userByName(anyString())).thenReturn(Optional.of(user));
-    //     when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
-
-    //     mockMvc.perform(post("/auth/login")
-    //                     .contentType(MediaType.APPLICATION_JSON)
-    //                     .content("{\"username\":\"testUser\",\"password\":\"wrongPassword\"}"))
-    //             .andExpect(status().isUnauthorized())
-    //             .andExpect(content().json("{\"status\":401,\"message\":\"Incorrect login or password\"}"));
-
-    //     verify(authTokenRepository, times(0)).save(any(AuthToken.class));
-    // }
-
-    // @Test
-    // void testSignup_Success() throws Exception {
-
-    //     when(userService.userByName(anyString())).thenReturn(Optional.empty());
-
-    //     mockMvc.perform(post("/auth/signup")
-    //                     .contentType(MediaType.APPLICATION_JSON)
-    //                     .content("{\"username\":\"newUser\",\"password\":\"password\"}"))
-    //             .andExpect(status().isOk())
-    //             .andExpect(content().json("{\"status\":200,\"message\":\"Successful registration\"}"));
-
-    //     verify(userService, times(1)).addUser(any(User.class));
-    // }
-
-    // @Test
-    // void testSignup_UserAlreadyExists() throws Exception {
-
-    //     when(userService.userByName(anyString())).thenReturn(Optional.of(user));
-
-    //     mockMvc.perform(post("/auth/signup")
-    //                     .contentType(MediaType.APPLICATION_JSON)
-    //                     .content("{\"username\":\"testUser\",\"password\":\"password\"}"))
-    //             .andExpect(status().isConflict())
-    //             .andExpect(content().json("{\"status\":409,\"message\":\"User with name testUser already exists\"}"));
-
-    //     verify(userService, times(0)).addUser(any(User.class));
-    // }
-
-    // @Test
-    // void testLogout_Success() throws Exception {
-    //     AuthToken authToken = new AuthToken();
-    //     authToken.setId(1L);
-    //     authToken.setToken("validToken");
-
-    //     when(authTokenRepository.findByToken(anyString())).thenReturn(Optional.of(authToken));
-
-    //     mockMvc.perform(post("/auth/logout")
-    //                     .header("Authorization", "Bearer validToken"))
-    //             .andExpect(status().isOk())
-    //             .andExpect(content().json("{\"status\":200,\"message\":\"Logged out\"}"));
-
-    //     verify(authTokenRepository, times(1)).deleteById(authToken.getId());
-    // }
-
-    // @Test
-    // void testLogout_Unauthorized() throws Exception {
-    //     mockMvc.perform(post("/auth/logout"))
-    //             .andExpect(status().isUnauthorized());
-
-    //     verify(authTokenRepository, times(0)).deleteById(anyLong());
-    // }
+        verify(authenticationService, times(1)).signIn(any(LoginRequest.class));
+    }
 }
