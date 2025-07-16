@@ -36,7 +36,10 @@ public class SecurityConfig {
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                ;
+                .exceptionHandling(exceptionHandler -> exceptionHandler.authenticationEntryPoint((request, response, authenticationException) -> {
+                            response.setStatus(403);
+                            response.getWriter().write("Authentication failed");
+                        }));
 
 
         return http.build();

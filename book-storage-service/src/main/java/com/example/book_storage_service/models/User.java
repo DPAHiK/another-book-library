@@ -21,11 +21,11 @@ public class User implements UserDetails {
     private String name;
     @Column(nullable = false)
     private String password;
-    private String role;
+    private Role role;
 
     public User() {}
 
-    public User(String name, String password, String role) {
+    public User(String name, String password, Role role) {
         this.name = name;
         this.password = password;
         this.role = role;
@@ -45,11 +45,11 @@ public class User implements UserDetails {
         this.id = id;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
@@ -100,7 +100,7 @@ public class User implements UserDetails {
 
         private String name;
         private String password;
-        private String role;
+        private Role role;
 
         public builder(){}
 
@@ -114,7 +114,7 @@ public class User implements UserDetails {
             return this;
         }
 
-        public builder role(String role) {
+        public builder role(Role role) {
             this.role = role;
             return this;
         }

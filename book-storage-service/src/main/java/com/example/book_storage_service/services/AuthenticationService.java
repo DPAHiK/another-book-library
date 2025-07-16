@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.book_storage_service.dto.JwtAuthenticationResponse;
 import com.example.book_storage_service.dto.LoginRequest;
+import com.example.book_storage_service.models.Role;
 import com.example.book_storage_service.models.User;
 
 @Service
@@ -37,7 +38,7 @@ public class AuthenticationService {
         var user = new User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role("ROLE_USER") //TODO: сделать enum для ролей
+                .role(Role.ROLE_USER)
                 .build();
 
         userService.addUser(user);
