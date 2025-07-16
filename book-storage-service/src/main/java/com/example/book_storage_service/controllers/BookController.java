@@ -17,6 +17,7 @@ import com.example.book_storage_service.dto.ResponseHandler;
 import com.example.book_storage_service.models.Book;
 import com.example.book_storage_service.services.BookService;
 import com.example.book_storage_service.services.ProducerService;
+import static com.example.book_storage_service.services.ProducerService.BOOK_TOPIC;
 
 import jakarta.validation.Valid;
 
@@ -53,7 +54,7 @@ public class BookController {
     @PostMapping("/book")
     public ResponseEntity<?> addBook(@RequestBody @Valid BookAddRequest book){
         Book result = bookService.addBook(book);
-        producerService.sendBookId("add-book-topic", result.getId().toString()); // TODO: сделать enum для topic
+        producerService.sendBookId(BOOK_TOPIC, result.getId().toString());
         return ResponseHandler.generateResponse(HttpStatus.OK, "message", "Book added (id: " + result.getId() +")");
     }
 
