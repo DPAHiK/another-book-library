@@ -1,6 +1,9 @@
 package com.example.book_storage_service.models;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
 public class Book {
@@ -22,6 +25,14 @@ public class Book {
         this.genre = genre;
         this.description = description;
         this.author = author;
+    }
+
+    public Book(builder b) {
+        this.isbn = b.isbn;
+        this.title = b.title;
+        this.genre = b.genre;
+        this.description = b.description;
+        this.author = b.author;
     }
 
     public Long getId() {
@@ -70,5 +81,35 @@ public class Book {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public static class builder{
+
+        private String isbn;
+        private String title;
+        private String genre;
+        private String description;
+        private String author;
+
+        public builder(){}
+
+        public builder isbn(String isbn) {
+            this.isbn = isbn;
+            return this;
+        }
+
+        public builder title(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public builder genre(String genre) {
+            this.genre = genre;
+            return this;
+        }
+
+        public Book build(){
+            return new Book(this);
+        }
     }
 }

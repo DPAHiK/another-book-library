@@ -8,10 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 public class ResponseHandler {
-    public static ResponseEntity<Object> generateResponse(HttpStatus status, String messages, Object data) {
+    public static ResponseEntity<Object> generateResponse(HttpStatus status, String message, Object data) {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("status", status.value());
-        map.put(messages, data);
+        map.put(message, data);
 
         return new ResponseEntity<>(map, status);
     }

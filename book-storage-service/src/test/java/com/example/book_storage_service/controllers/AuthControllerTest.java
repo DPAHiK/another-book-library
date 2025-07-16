@@ -8,14 +8,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.example.book_storage_service.models.User;
-import com.example.book_storage_service.repo.AuthTokenRepository;
 import com.example.book_storage_service.services.UserService;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthControllerTest {
-
-    @Mock
-    private AuthTokenRepository authTokenRepository;
 
     @Mock
     private UserService userService;
