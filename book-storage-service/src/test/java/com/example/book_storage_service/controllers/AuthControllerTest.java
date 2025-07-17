@@ -12,6 +12,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -38,7 +40,6 @@ class AuthControllerTest {
 
     @Test
     void signUp_ValidRequest_ReturnsJwtResponse() throws Exception {
-        // Arrange
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setUsername("testuser");
         loginRequest.setPassword("password");
@@ -48,11 +49,12 @@ class AuthControllerTest {
 
         when(authenticationService.signUp(any(LoginRequest.class))).thenReturn(jwtResponse);
 
-        // Act & Assert
         mockMvc.perform(post("/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"username\":\"testuser\",\"password\":\"password\"}"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.token").value("jwt.token.here"));
 
         verify(authenticationService, times(1)).signUp(any(LoginRequest.class));
     }
@@ -73,7 +75,9 @@ class AuthControllerTest {
         mockMvc.perform(post("/auth/signin")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"username\":\"testuser\",\"password\":\"password\"}"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.token").value("jwt.token.here"));
 
         verify(authenticationService, times(1)).signIn(any(LoginRequest.class));
     }
