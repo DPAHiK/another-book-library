@@ -1,7 +1,7 @@
 package com.example.book_tracker_service.controllers;
 
 import com.example.book_tracker_service.models.BookTracker;
-import com.example.book_tracker_service.response_and_request.ResponseHandler;
+import com.example.book_tracker_service.dto.ResponseHandler;
 import com.example.book_tracker_service.services.BookTrackerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,35 +1,35 @@
 package com.example.book_tracker_service.services;
 
-import com.example.book_tracker_service.repo.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import com.example.book_tracker_service.models.User;
-
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import com.example.book_tracker_service.exception.CustomHttpException;
+import com.example.book_tracker_service.models.User;
+import com.example.book_tracker_service.repo.UserRepository;
+
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    @Autowired
+    private UserRepository userRepository;
 
-    final private UserRepository userRepository;
-
-    private final PasswordEncoder passwordEncoder;
-
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+    public User userByName(String name){
+        Optional<User> user = userRepository.findByName(name);
+        if (user.isPresent()) return user.get();
+        else throw new UsernameNotFoundException(name + " not found");
     }
 
-    public Optional<User> userByName(String name){
-        return userRepository.findByName(name);
-    }
-
-    public Optional<User> userById(Long id){
-        return userRepository.findById(id);
+    public User userById(Long id){
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) return user.get();
+        else throw new CustomHttpException("User with id " + id + " not found", HttpStatus.NOT_FOUND);
     }
 
     public List<User> allUsers(){
@@ -37,19 +37,25 @@ public class UserService {
     }
 
     public void addUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (userRepository.existsByName(user.getUsername())) {
+            throw new CustomHttpException("User with username" + user.getUsername() + "already exists", HttpStatus.CONFLICT);
+        }
         userRepository.save(user);
     }
 
     public void deleteUserById(Long id){
         Optional<User> user = userRepository.findById(id);
 
-        user.ifPresentOrElse(u ->{
-            userRepository.deleteById(u.getId());
-        }, ()->{
-            logger.warn("While deleting: user with id {} have not found", id);
-        });
+        if(user.isPresent()){
+            userRepository.deleteById(id);
+        }
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> user = userRepository.findByName(username);
+        if (user.isPresent()) return user.get();
+        else   throw new UsernameNotFoundException(username + " not found");
+    }
 
 }

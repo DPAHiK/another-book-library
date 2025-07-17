@@ -17,15 +17,24 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true)
+    @Column(unique = true, nullable=false)
     private String name;
+    @Column(nullable = false)
     private String password;
+    private Role role;
 
     public User() {}
 
-    public User(String name, String password, String roles) {
+    public User(String name, String password, Role role) {
         this.name = name;
         this.password = password;
+        this.role = role;
+    }
+
+    public User(builder b) {
+        this.name = b.name;
+        this.password = b.password;
+        this.role = b.role;
     }
 
     public Long getId() {
@@ -34,6 +43,14 @@ public class User implements UserDetails {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     @Override
@@ -77,5 +94,33 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
+    }
+
+    public static class builder{
+
+        private String name;
+        private String password;
+        private Role role;
+
+        public builder(){}
+
+        public builder username(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public builder password(String password) {
+            this.password = password;
+            return this;
+        }
+
+        public builder role(Role role) {
+            this.role = role;
+            return this;
+        }
+
+        public User build(){
+            return new User(this);
+        }
     }
 }

@@ -1,11 +1,11 @@
-package com.example.book_tracker_service.response_and_request;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+package com.example.book_tracker_service.dto;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 public class ResponseHandler {
     public static ResponseEntity<Object> generateResponse(HttpStatus status, String messages, Object data) {
