@@ -1,21 +1,23 @@
 services:
-########KAFKA########
+
+  ######## KAFKA ########
+
   zookeeper:
-    container_name: ZOOKEPEER
+    container_name: ZOOKEEPER
     image: confluentinc/cp-zookeeper:7.4.4
     environment:
       ZOOKEEPER_CLIENT_PORT: ${ZOOKEPEER_PORT}
       ZOOKEEPER_TICK_TIME: 2000
     ports:
-      - ${ZOOKEPEER_PORT}:${ZOOKEPEER_PORT}
-  
+      - "${ZOOKEPEER_PORT}:${ZOOKEPEER_PORT}"
+
   kafka:
     container_name: KAFKA
     image: confluentinc/cp-kafka:7.4.4
     depends_on:
       - zookeeper
     ports:
-      - ${KAFKA_HOST_PORT}:${KAFKA_HOST_PORT}
+      - "${KAFKA_HOST_PORT}:${KAFKA_HOST_PORT}"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:${ZOOKEPEER_PORT}
@@ -30,13 +32,34 @@ services:
     depends_on:
       - kafka
     ports:
-      - 8090:8080
+      - "8090:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:${KAFKA_PORT}
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:${ZOOKEPEER_PORT}
 
-########TRACKER########
+
+  ######## MYSQL ########
+
+  mysql:
+    container_name: MYSQL
+    image: mysql:8.0
+    ports:
+      - "3307:3306"
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ROOT_MYSQL_PASS}
+      MYSQL_DATABASE: ${TRACKER_DB_NAME}
+      MYSQL_USER: ${TRACKER_DB_USER}
+      MYSQL_PASSWORD: ${TRACKER_DB_PASS}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init.sh:/docker-entrypoint-initdb.d/init.sh
+
+
+  ######## TRACKER ########
+
   tracker:
     container_name: BOOK_TRACKER
     restart: always
@@ -48,28 +71,14 @@ services:
     env_file:
       - .env
     depends_on:
-     - tracker_db
-     - kafka
+      - mysql
+      - kafka
     environment:
-      - SERVER_PORT=8080
-      - SPRING_DATASOURCE_URL=jdbc:mysql://tracker_db/${TRACKER_DB_NAME}
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql/${TRACKER_DB_NAME}
 
-  tracker_db:
-    image: mysql
-    container_name: MYSQL_BOOK_TRACKER
-    ports:
-      - '3366:3306'
-    env_file:
-      - .env
-    environment:
-      MYSQL_ROOT_PASSWORD: ${ROOT_MYSQL_PASS}
-      MYSQL_DATABASE: ${TRACKER_DB_NAME}
-      MYSQL_USER: ${TRACKER_DB_USER}
-      MYSQL_PASSWORD: ${TRACKER_DB_PASS}
-    volumes:
-      - tracker_data:/var/lib/mysql/
 
-########STORAGE########
+  ######## STORAGE ########
 
   storage:
     container_name: BOOK_STORAGE
@@ -82,28 +91,14 @@ services:
     env_file:
       - .env
     depends_on:
-     - storage_db
-     - kafka
+      - mysql
+      - kafka
     environment:
-      - SERVER_PORT=8080
-      - SPRING_DATASOURCE_URL=jdbc:mysql://storage_db/${STORAGE_DB_NAME}
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql/${STORAGE_DB_NAME}
 
-  storage_db:
-    image: mysql
-    container_name: MYSQL_BOOK_STORAGE
-    ports:
-      - '3307:3306'
-    env_file:
-      - .env
-    environment:
-      MYSQL_ROOT_PASSWORD: ${ROOT_MYSQL_PASS}
-      MYSQL_DATABASE: ${STORAGE_DB_NAME}
-      MYSQL_USER: ${STORAGE_DB_USER}
-      MYSQL_PASSWORD: ${STORAGE_DB_PASS}
-    volumes:
-      - storage_data:/var/lib/mysql/
-      
-########AUTH##########
+
+  ######## AUTH ########
 
   auth:
     container_name: BOOK_AUTH
@@ -116,28 +111,12 @@ services:
     env_file:
       - .env
     depends_on:
-     - auth_db
-     - kafka
+      - mysql
+      - kafka
     environment:
-      - SERVER_PORT=8080
-      - SPRING_DATASOURCE_URL=jdbc:mysql://auth_db/${AUTH_DB_NAME}
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql/${AUTH_DB_NAME}
 
-  auth_db:
-    image: mysql
-    container_name: MYSQL_BOOK_AUTH
-    ports:
-      - '3308:3306'
-    env_file:
-      - .env
-    environment:
-      MYSQL_ROOT_PASSWORD: ${ROOT_MYSQL_PASS}
-      MYSQL_DATABASE: ${AUTH_DB_NAME}
-      MYSQL_USER: ${AUTH_DB_USER}
-      MYSQL_PASSWORD: ${AUTH_DB_PASS}
-    volumes:
-      - auth_data:/var/lib/mysql/
-      
+
 volumes:
-  tracker_data:
-  storage_data:
-  auth_data:
+  mysql_data:
