@@ -1,2 +1,3 @@
 /book-storage-service/target
 /book-tracker-service/target
+.env

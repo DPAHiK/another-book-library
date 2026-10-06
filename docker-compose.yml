@@ -41,9 +41,9 @@ services:
     container_name: BOOK_TRACKER
     restart: always
     ports:
-      - "8081:${TRACKER_PORT}"
+      - "8081:8080"
     build:
-      context: "./book-tracker-service/"
+      context: ./book-tracker-service/
       dockerfile: Dockerfile
     env_file:
       - .env
@@ -51,14 +51,14 @@ services:
      - tracker_db
      - kafka
     environment:
-      - SERVER_PORT= ${TRACKER_PORT}
+      - SERVER_PORT=8080
       - SPRING_DATASOURCE_URL=jdbc:mysql://tracker_db/${TRACKER_DB_NAME}
 
   tracker_db:
     image: mysql
     container_name: MYSQL_BOOK_TRACKER
     ports:
-      - '3306:${TRACKER_DB_PORT}'
+      - '3366:3306'
     env_file:
       - .env
     environment:
@@ -71,37 +71,37 @@ services:
 
 ########STORAGE########
 
-  # storage:
-  #   container_name: BOOK_STORAGE
-  #   restart: always
-  #   ports:
-  #     - "8080:${STORAGE_PORT}"
-  #   build:
-  #     context: "./book-storage-service/"
-  #     dockerfile: Dockerfile
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #    - storage_db
-  #    - kafka
-  #   environment:
-  #     - SERVER_PORT= ${STORAGE_PORT}
-  #     - SPRING_DATASOURCE_URL=jdbc:mysql://storage_db/${STORAGE_DB_NAME}
+  storage:
+    container_name: BOOK_STORAGE
+    restart: always
+    ports:
+      - "8080:8080"
+    build:
+      context: ./book-storage-service/
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    depends_on:
+     - storage_db
+     - kafka
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_DATASOURCE_URL=jdbc:mysql://storage_db/${STORAGE_DB_NAME}
 
-  # storage_db:
-  #   image: mysql
-  #   container_name: MYSQL_BOOK_STORAGE
-  #   ports:
-  #     - '3307:${STORAGE_DB_PORT}'
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: ${ROOT_MYSQL_PASS}
-  #     MYSQL_DATABASE: ${STORAGE_DB_NAME}
-  #     MYSQL_USER: ${STORAGE_DB_USER}
-  #     MYSQL_PASSWORD: ${STORAGE_DB_PASS}
-  #   volumes:
-  #     - storage_data:/var/lib/mysql/
+  storage_db:
+    image: mysql
+    container_name: MYSQL_BOOK_STORAGE
+    ports:
+      - '3307:3306'
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ROOT_MYSQL_PASS}
+      MYSQL_DATABASE: ${STORAGE_DB_NAME}
+      MYSQL_USER: ${STORAGE_DB_USER}
+      MYSQL_PASSWORD: ${STORAGE_DB_PASS}
+    volumes:
+      - storage_data:/var/lib/mysql/
       
 volumes:
   tracker_data:
