@@ -1,4 +1,4 @@
-package com.example.book_storage_service.services;
+package com.example.book_auth_service.services;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,9 +10,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.example.book_storage_service.exception.CustomHttpException;
-import com.example.book_storage_service.models.User;
-import com.example.book_storage_service.repo.UserRepository;
+import com.example.book_auth_service.exception.CustomHttpException;
+import com.example.book_auth_service.models.User;
+import com.example.book_auth_service.repo.UserRepository;
 
 @Service
 public class UserService implements UserDetailsService {

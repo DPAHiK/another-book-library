@@ -1,10 +1,10 @@
-package com.example.book_tracker_service;
+package com.example.book_auth_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BookTrackerTrackerServiceApplicationTests {
+class BookAuthServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

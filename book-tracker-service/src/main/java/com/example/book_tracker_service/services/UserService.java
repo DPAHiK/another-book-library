@@ -38,7 +38,7 @@ public class UserService implements UserDetailsService {
 
     public void addUser(User user) {
         if (userRepository.existsByName(user.getUsername())) {
-            throw new CustomHttpException("User with username" + user.getUsername() + "already exists", HttpStatus.CONFLICT);
+            throw new CustomHttpException("User with username " + user.getUsername() + "already exists", HttpStatus.CONFLICT);
         }
         userRepository.save(user);
     }
