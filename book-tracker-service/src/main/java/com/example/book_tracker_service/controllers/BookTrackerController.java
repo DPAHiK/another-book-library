@@ -3,6 +3,7 @@ package com.example.book_tracker_service.controllers;
 import com.example.book_tracker_service.models.BookTracker;
 import com.example.book_tracker_service.dto.ResponseHandler;
 import com.example.book_tracker_service.dto.BookTrackerUpdateDto;
+import com.example.book_tracker_service.dto.BookTrackerAddDto;
 import com.example.book_tracker_service.services.BookTrackerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,12 +27,11 @@ public class BookTrackerController {
 
     @GetMapping("/book/free")
     public ResponseEntity<?> getFreeBooks(){
-
         return ResponseHandler.generateResponse(HttpStatus.OK, "data", bookTrackerService.findFreeBooks());
     }
 
     @PostMapping("/book/tracker")
-    public ResponseEntity<?> addBookTracker(@RequestBody BookTracker bookTracker){
+    public ResponseEntity<?> addBookTracker(@RequestBody BookTrackerAddDto bookTracker){
         bookTrackerService.addBookTracker(bookTracker);
 
         return ResponseHandler.generateResponse(HttpStatus.OK, "message", "BookTracker added");
