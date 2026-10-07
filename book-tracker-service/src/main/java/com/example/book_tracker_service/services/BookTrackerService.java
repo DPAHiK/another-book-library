@@ -1,6 +1,8 @@
 package com.example.book_tracker_service.services;
 
 import com.example.book_tracker_service.models.BookTracker;
+import com.example.book_tracker_service.dto.BookTrackerUpdateDto;
+import com.example.book_tracker_service.mapper.BookTrackerMapper;
 import com.example.book_tracker_service.repo.BookTrackerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +18,11 @@ public class BookTrackerService {
 
     private final BookTrackerRepository bookTrackerRepository;
 
-    public BookTrackerService(BookTrackerRepository bookTrackerRepository){
+    private final BookTrackerMapper bookTrackerMapper;
+
+    public BookTrackerService(BookTrackerRepository bookTrackerRepository,  BookTrackerMapper bookTrackerMapper){
         this.bookTrackerRepository = bookTrackerRepository;
+        this.bookTrackerMapper = bookTrackerMapper;
     }
 
     public Optional<BookTracker> findById(Long id){
@@ -32,6 +37,19 @@ public class BookTrackerService {
         return bookTrackerRepository.save(bookTracker);
     }
 
+    public Optional<BookTracker> editBookTracker(Long id, BookTrackerUpdateDto bookTrackerData){
+        Optional<BookTracker> oldBookTracker = bookTrackerRepository.findById(id);
+        if(!oldBookTracker.isPresent()){
+            logger.warn("While editing: bookTracker with id " + id +" not found");
+            return Optional.empty();
+        }
+
+        BookTracker newBookTracker = oldBookTracker.get();
+
+        bookTrackerMapper.updateBookTracker(bookTrackerData, newBookTracker);
+
+        return Optional.of(bookTrackerRepository.save(newBookTracker));
+    }
 
     public boolean deleteBookTrackerById(Long id){
         Optional<BookTracker> book = bookTrackerRepository.findById(id);

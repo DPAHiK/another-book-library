@@ -2,6 +2,7 @@ package com.example.book_tracker_service.controllers;
 
 import com.example.book_tracker_service.models.BookTracker;
 import com.example.book_tracker_service.dto.ResponseHandler;
+import com.example.book_tracker_service.dto.BookTrackerUpdateDto;
 import com.example.book_tracker_service.services.BookTrackerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,25 +45,11 @@ public class BookTrackerController {
 
     }
 
-    @PutMapping("/book/tracker/{id}")
-    public ResponseEntity<?> editBookTracker(@RequestBody BookTracker bookTracker, @PathVariable(value = "id") Long id){
-        Optional<BookTracker> oldBookTracker = bookTrackerService.findById(id);
-        if(oldBookTracker.isPresent()){
-            BookTracker newBookTracker = oldBookTracker.get();
-
-            newBookTracker.setFree(bookTracker.isFree());
-            newBookTracker.setBookId(bookTracker.getBookId());
-            newBookTracker.setReturnDate(bookTracker.getReturnDate());
-            newBookTracker.setTakeDate(bookTracker.getTakeDate());
-
-            bookTrackerService.addBookTracker(newBookTracker);
-
-            return ResponseHandler.generateResponse( HttpStatus.OK , "deleted", "Book tracker edited");
-        }
-
-        logger.warn("While editing: bookTracker with id " + id +" not found");
-
-
-        return ResponseHandler.generateResponse( HttpStatus.NOT_FOUND , "message", "Book tracker with id " + id + " not found");
+    @PatchMapping("/book/tracker/{id}")
+    public ResponseEntity<?> editBookTracker(@RequestBody BookTrackerUpdateDto bookTrackerData, @PathVariable(value = "id") Long id){
+        Optional<BookTracker> result = bookTrackerService.editBookTracker(id, bookTrackerData);
+        return result.isPresent() ? 
+                ResponseHandler.generateResponse( HttpStatus.OK, "edited", result) : 
+                ResponseHandler.generateResponse( HttpStatus.NOT_FOUND, "message", "Book tracker with id " + id + " not found");
     }
 }
