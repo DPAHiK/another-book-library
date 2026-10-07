@@ -41,7 +41,7 @@ public class BookTrackerController {
     public ResponseEntity<?> deleteBookTracker(@PathVariable(value = "id") Long id){
         boolean result = bookTrackerService.deleteBookTrackerById(id);
 
-        return ResponseHandler.generateResponse(result ? HttpStatus.OK : HttpStatus.NOT_FOUND, "deleted", result);
+        return ResponseHandler.generateResponse(HttpStatus.OK, "deleted", result);
 
     }
 
