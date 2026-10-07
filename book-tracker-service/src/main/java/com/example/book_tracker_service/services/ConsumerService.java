@@ -1,6 +1,6 @@
 package com.example.book_tracker_service.services;
 
-import com.example.book_tracker_service.models.BookTracker;
+import com.example.book_tracker_service.dto.BookTrackerAddDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -21,7 +21,7 @@ public class ConsumerService {
     public void listenAddBook(String bookId) {
         logger.info("Received Book ID (add): {}", bookId);
 
-        BookTracker bookTracker = new BookTracker();
+        BookTrackerAddDto bookTracker = new BookTrackerAddDto();
         bookTracker.setFree(true);
         bookTracker.setBookId(Long.valueOf(bookId));
         bookTrackerService.addBookTracker(bookTracker);

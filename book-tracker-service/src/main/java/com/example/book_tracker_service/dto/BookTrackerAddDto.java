@@ -1,22 +1,22 @@
 package com.example.book_tracker_service.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.sql.Date;
 
 
-public class BookTrackerUpdateDto {
+public class BookTrackerAddDto {
 
-    @NotBlank(message = "id книги не может быть пустыми")
+    @NotNull(message = "id книги не может быть пустыми")
     private Long bookId;
 
-    @NotBlank(message = "Укажите статус книги")
+    @NotNull(message = "Укажите статус книги")
     private Boolean isFree;
 
     private Date returnDate;
     private Date takeDate;
 
-    public BookTrackerUpdateDto(){
+    public BookTrackerAddDto(){
     }
 
     public BookTrackerAddDto(Long bookId, boolean isFree, Date takeDate, Date returnDate) {

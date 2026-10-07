@@ -2,6 +2,7 @@ package com.example.book_tracker_service.services;
 
 import com.example.book_tracker_service.models.BookTracker;
 import com.example.book_tracker_service.dto.BookTrackerUpdateDto;
+import com.example.book_tracker_service.dto.BookTrackerAddDto;
 import com.example.book_tracker_service.mapper.BookTrackerMapper;
 import com.example.book_tracker_service.repo.BookTrackerRepository;
 import org.slf4j.Logger;
@@ -33,7 +34,13 @@ public class BookTrackerService {
         return bookTrackerRepository.findByIsFree(true);
     }
 
-    public BookTracker addBookTracker(BookTracker bookTracker){
+    public BookTracker addBookTracker(BookTrackerAddDto bookTrackerData){
+        BookTracker bookTracker = new BookTracker(
+                                bookTrackerData.getBookId(),
+                                bookTrackerData.isFree(),
+                                bookTrackerData.getTakeDate(),
+                                bookTrackerData.getReturnDate()
+                                );
         return bookTrackerRepository.save(bookTracker);
     }
 

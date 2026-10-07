@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import jakarta.validation.Valid;
 
 
 @RestController
@@ -31,10 +32,10 @@ public class BookTrackerController {
     }
 
     @PostMapping("/book/tracker")
-    public ResponseEntity<?> addBookTracker(@RequestBody BookTrackerAddDto bookTracker){
-        bookTrackerService.addBookTracker(bookTracker);
+    public ResponseEntity<?> addBookTracker(@RequestBody @Valid BookTrackerAddDto bookTrackerData){
+        BookTracker result = bookTrackerService.addBookTracker(bookTrackerData);
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, "message", "BookTracker added");
+        return ResponseHandler.generateResponse(HttpStatus.OK, "added", result);
     }
 
     @DeleteMapping("/book/tracker/{id}")

@@ -17,8 +17,7 @@ public class BookTracker {
     public BookTracker() {
     }
 
-    public BookTracker(Long id, Long bookId, boolean isFree, Date takeDate, Date returnDate) {
-        this.id = id;
+    public BookTracker(Long bookId, boolean isFree, Date takeDate, Date returnDate) {
         this.bookId = bookId;
         this.isFree = isFree;
         this.takeDate = takeDate;
