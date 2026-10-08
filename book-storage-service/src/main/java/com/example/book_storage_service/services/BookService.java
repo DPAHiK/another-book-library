@@ -10,6 +10,7 @@ import com.example.book_storage_service.dto.BookAddRequest;
 import com.example.book_storage_service.dto.BookEditRequest;
 import com.example.book_storage_service.exception.CustomHttpException;
 import com.example.book_storage_service.models.Book;
+import com.example.book_storage_service.mapper.BookMapper;
 import com.example.book_storage_service.repo.BookRepository;
 
 @Service
@@ -17,8 +18,11 @@ public class BookService {
 
     final private BookRepository bookRepository;
 
-    public BookService(BookRepository bookRepository) {
+    final private BookMapper bookMapper;
+
+    public BookService(BookRepository bookRepository, BookMapper bookMapper) {
         this.bookRepository = bookRepository;
+        this.bookMapper = bookMapper;
     }
 
     public Book bookByIsbn(String isbn) {
@@ -53,17 +57,12 @@ public class BookService {
         return bookRepository.save(newBook);
     }
 
-    public Book editBook(Long id, BookEditRequest book) {
+    public Book editBook(Long id, BookEditRequest bookData) {
         Optional<Book> existBook = bookRepository.findById(id);
         if (!existBook.isPresent()) throw new CustomHttpException("Book with id " + id + " not found", HttpStatus.NOT_FOUND);
         
         Book newBook = existBook.get();
-        if(book.getAuthor() != null) newBook.setAuthor(book.getAuthor());
-        if(book.getDescription() != null) newBook.setDescription(book.getDescription());
-        if(book.getGenre() != null) newBook.setGenre(book.getGenre());
-        if(book.getIsbn() != null) newBook.setIsbn(book.getIsbn());
-        if(book.getTitle() != null) newBook.setTitle(book.getTitle());
-
+        bookMapper.updateBook(bookData, newBook);
         return bookRepository.save(newBook);
     }
 

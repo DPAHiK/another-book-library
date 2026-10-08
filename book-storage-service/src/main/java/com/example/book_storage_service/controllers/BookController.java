@@ -3,13 +3,7 @@ package com.example.book_storage_service.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.book_storage_service.dto.BookAddRequest;
 import com.example.book_storage_service.dto.BookEditRequest;
@@ -58,7 +52,7 @@ public class BookController {
         return ResponseHandler.generateResponse(HttpStatus.OK, "data", result);
     }
 
-    @PutMapping("/book/{id}")
+    @PatchMapping("/book/{id}")
     public ResponseEntity<?> editBook(@RequestBody @Valid BookEditRequest book, @PathVariable(value = "id") Long id){
         Book result = bookService.editBook(id, book);
         return ResponseHandler.generateResponse(HttpStatus.OK, "data", result);
