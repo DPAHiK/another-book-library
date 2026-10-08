@@ -34,23 +34,19 @@ public class BookTrackerController {
     @PostMapping("/book/tracker")
     public ResponseEntity<?> addBookTracker(@RequestBody @Valid BookTrackerAddDto bookTrackerData){
         BookTracker result = bookTrackerService.addBookTracker(bookTrackerData);
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, "added", result);
+        return ResponseHandler.generateResponse(HttpStatus.OK, "data", result);
     }
 
     @DeleteMapping("/book/tracker/{id}")
     public ResponseEntity<?> deleteBookTracker(@PathVariable(value = "id") Long id){
         boolean result = bookTrackerService.deleteBookTrackerById(id);
-
         return ResponseHandler.generateResponse(HttpStatus.OK, "deleted", result);
 
     }
 
     @PatchMapping("/book/tracker/{id}")
     public ResponseEntity<?> editBookTracker(@RequestBody BookTrackerUpdateDto bookTrackerData, @PathVariable(value = "id") Long id){
-        Optional<BookTracker> result = bookTrackerService.editBookTracker(id, bookTrackerData);
-        return result.isPresent() ? 
-                ResponseHandler.generateResponse( HttpStatus.OK, "edited", result) : 
-                ResponseHandler.generateResponse( HttpStatus.NOT_FOUND, "message", "Book tracker with id " + id + " not found");
+        BookTracker result = bookTrackerService.editBookTracker(id, bookTrackerData);
+        return ResponseHandler.generateResponse( HttpStatus.OK, "data", result);
     }
 }

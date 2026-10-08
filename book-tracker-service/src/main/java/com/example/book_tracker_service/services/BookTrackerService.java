@@ -5,6 +5,8 @@ import com.example.book_tracker_service.dto.BookTrackerUpdateDto;
 import com.example.book_tracker_service.dto.BookTrackerAddDto;
 import com.example.book_tracker_service.mapper.BookTrackerMapper;
 import com.example.book_tracker_service.repo.BookTrackerRepository;
+import com.example.book_tracker_service.exception.CustomHttpException;
+import org.springframework.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -44,18 +46,13 @@ public class BookTrackerService {
         return bookTrackerRepository.save(bookTracker);
     }
 
-    public Optional<BookTracker> editBookTracker(Long id, BookTrackerUpdateDto bookTrackerData){
+    public BookTracker editBookTracker(Long id, BookTrackerUpdateDto bookTrackerData){
         Optional<BookTracker> oldBookTracker = bookTrackerRepository.findById(id);
-        if(!oldBookTracker.isPresent()){
-            logger.warn("While editing: bookTracker with id " + id +" not found");
-            return Optional.empty();
-        }
-
+        if (!oldBookTracker.isPresent()) throw new CustomHttpException("Book tracker with id " + id + " not found", HttpStatus.NOT_FOUND);
+        
         BookTracker newBookTracker = oldBookTracker.get();
-
         bookTrackerMapper.updateBookTracker(bookTrackerData, newBookTracker);
-
-        return Optional.of(bookTrackerRepository.save(newBookTracker));
+        return bookTrackerRepository.save(newBookTracker);
     }
 
     public boolean deleteBookTrackerById(Long id){
@@ -66,7 +63,7 @@ public class BookTrackerService {
             return true;
         }
 
-        logger.warn("While deleting: bookTracker with bookId {} not found", id);
+        logger.info("While deleting: bookTracker with bookId {} not found", id);
         return false;
     }
 
@@ -78,7 +75,7 @@ public class BookTrackerService {
             return;
         }
 
-        logger.warn("While deleting: bookTracker with id {} not found", bookId);
+        logger.info("While deleting: bookTracker with id {} not found", bookId);
 
     }
 }
