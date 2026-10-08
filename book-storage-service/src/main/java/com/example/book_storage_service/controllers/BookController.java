@@ -55,19 +55,19 @@ public class BookController {
     public ResponseEntity<?> addBook(@RequestBody @Valid BookAddRequest book){
         Book result = bookService.addBook(book);
         producerService.sendBookId(BOOK_TOPIC, result.getId().toString());
-        return ResponseHandler.generateResponse(HttpStatus.OK, "message", "Book added (id: " + result.getId() +")");
+        return ResponseHandler.generateResponse(HttpStatus.OK, "data", result);
     }
 
     @PutMapping("/book/{id}")
     public ResponseEntity<?> editBook(@RequestBody @Valid BookEditRequest book, @PathVariable(value = "id") Long id){
-        bookService.editBook(id, book);
-        return ResponseHandler.generateResponse(HttpStatus.OK, "message", "Book with id " + id + " edited");
+        Book result = bookService.editBook(id, book);
+        return ResponseHandler.generateResponse(HttpStatus.OK, "data", result);
     }
 
     @DeleteMapping("/book/{id}")
     public ResponseEntity<?> deleteBook(@PathVariable(value = "id") Long id) {
 
         int deletedCount = bookService.deleteBookById(id);
-        return ResponseHandler.generateResponse(HttpStatus.OK, "message", "Books deleted: " + deletedCount);
+        return ResponseHandler.generateResponse(HttpStatus.OK, "deleted", deletedCount);
     }
 }
