@@ -39,8 +39,8 @@ public class BookTrackerController {
 
     @DeleteMapping("/book/tracker/{id}")
     public ResponseEntity<?> deleteBookTracker(@PathVariable(value = "id") Long id){
-        boolean result = bookTrackerService.deleteBookTrackerById(id);
-        return ResponseHandler.generateResponse(HttpStatus.OK, "deleted", result);
+        int deletedCount = bookTrackerService.deleteBookTrackerById(id);
+        return ResponseHandler.generateResponse(HttpStatus.OK, "deleted", deletedCount);
 
     }
 

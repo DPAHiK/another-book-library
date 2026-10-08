@@ -55,27 +55,25 @@ public class BookTrackerService {
         return bookTrackerRepository.save(newBookTracker);
     }
 
-    public boolean deleteBookTrackerById(Long id){
+    public int deleteBookTrackerById(Long id){
         Optional<BookTracker> book = bookTrackerRepository.findById(id);
 
         if(book.isPresent()){
             bookTrackerRepository.deleteById(id);
-            return true;
+            return 1;
         }
 
-        logger.info("While deleting: bookTracker with bookId {} not found", id);
-        return false;
+        return 0;
     }
 
-    public void deleteBookTrackerByBookId(Long bookId){
+    public int deleteBookTrackerByBookId(Long bookId){
         Optional<BookTracker> book = bookTrackerRepository.findByBookId(bookId);
 
         if(book.isPresent()){
             bookTrackerRepository.deleteById(book.get().getId());
-            return;
+            return 1;
         }
 
-        logger.info("While deleting: bookTracker with id {} not found", bookId);
-
+        return 0;
     }
 }
