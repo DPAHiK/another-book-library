@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 
 
 
-public class BookAddRequest {
+public class BookAddDto {
 
     @Size(min = 17, max = 17, message = "ISBN должен состоять из 17 символов (13 цифр и 4 дефиса)")
     @NotBlank(message = "ISBN не может быть пустыми")
@@ -26,9 +26,9 @@ public class BookAddRequest {
     @NotBlank(message = "Имя автора не может быть пустыми")
     private String author;
 
-    public BookAddRequest(){}
+    public BookAddDto(){}
 
-    public BookAddRequest(String isbn, String title, String genre, String description, String author) {
+    public BookAddDto(String isbn, String title, String genre, String description, String author) {
         this.isbn = isbn;
         this.title = title;
         this.genre = genre;

@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Size;
 
 
 
-public class BookEditRequest {
+public class BookUpdateDto {
 
     @Size(min = 17, max = 17, message = "ISBN должен состоять из 17 символов (13 цифр и 4 дефиса)")
     private String isbn;
@@ -21,9 +21,9 @@ public class BookEditRequest {
     @Size(min = 1, max = 255, message = "Имя автора должно содержать от 1 до 255 символов")
     private String author;
 
-    public BookEditRequest(){}
+    public BookUpdateDto(){}
 
-    public BookEditRequest(String isbn, String title, String genre, String description, String author) {
+    public BookUpdateDto(String isbn, String title, String genre, String description, String author) {
         this.isbn = isbn;
         this.title = title;
         this.genre = genre;

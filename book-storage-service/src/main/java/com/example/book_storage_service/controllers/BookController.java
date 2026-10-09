@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.book_storage_service.dto.BookAddRequest;
-import com.example.book_storage_service.dto.BookEditRequest;
+import com.example.book_storage_service.dto.BookAddDto;
+import com.example.book_storage_service.dto.BookUpdateDto;
 import com.example.book_storage_service.dto.ResponseHandler;
 import com.example.book_storage_service.models.Book;
 import com.example.book_storage_service.services.BookService;
@@ -46,14 +46,14 @@ public class BookController {
     }
 
     @PostMapping("/book")
-    public ResponseEntity<?> addBook(@RequestBody @Valid BookAddRequest book){
+    public ResponseEntity<?> addBook(@RequestBody @Valid BookAddDto book){
         Book result = bookService.addBook(book);
         producerService.sendBookId(BOOK_TOPIC, result.getId().toString());
         return ResponseHandler.generateResponse(HttpStatus.OK, "data", result);
     }
 
     @PatchMapping("/book/{id}")
-    public ResponseEntity<?> editBook(@RequestBody @Valid BookEditRequest book, @PathVariable(value = "id") Long id){
+    public ResponseEntity<?> editBook(@RequestBody @Valid BookUpdateDto book, @PathVariable(value = "id") Long id){
         Book result = bookService.editBook(id, book);
         return ResponseHandler.generateResponse(HttpStatus.OK, "data", result);
     }

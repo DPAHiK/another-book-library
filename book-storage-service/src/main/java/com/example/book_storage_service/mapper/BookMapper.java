@@ -1,6 +1,6 @@
 package com.example.book_storage_service.mapper;
 
-import com.example.book_storage_service.dto.BookEditRequest;
+import com.example.book_storage_service.dto.BookUpdateDto;
 import com.example.book_storage_service.models.Book;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -12,7 +12,7 @@ import org.mapstruct.MappingTarget;
 public interface BookMapper {
 
     void updateBook(
-            BookEditRequest dto,
+            BookUpdateDto dto,
             @MappingTarget Book book
     );
 }

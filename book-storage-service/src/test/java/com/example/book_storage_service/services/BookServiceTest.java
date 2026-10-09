@@ -15,8 +15,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
-import com.example.book_storage_service.dto.BookAddRequest;
-import com.example.book_storage_service.dto.BookEditRequest;
+import com.example.book_storage_service.dto.BookAddDto;
+import com.example.book_storage_service.dto.BookUpdateDto;
 import com.example.book_storage_service.models.Book;
 import com.example.book_storage_service.repo.BookRepository;
 
@@ -107,7 +107,7 @@ class BookServiceTest {
 
     @Test
     void addBook_ReturnsBook() throws Exception {
-        BookAddRequest request = new BookAddRequest(
+        BookAddDto request = new BookAddDto(
             "978-3-16-148410-0",
             "title1",
             "genre1",
@@ -137,7 +137,7 @@ class BookServiceTest {
 
     @Test
     void editBook_BookExists_ReturnsBook() throws Exception {
-        BookEditRequest request = new BookEditRequest(
+        BookUpdateDto request = new BookUpdateDto(
             "978-3-16-148410-0",
             "newTitle1",
             "genre1",

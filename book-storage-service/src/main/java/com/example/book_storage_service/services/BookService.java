@@ -6,8 +6,8 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.example.book_storage_service.dto.BookAddRequest;
-import com.example.book_storage_service.dto.BookEditRequest;
+import com.example.book_storage_service.dto.BookAddDto;
+import com.example.book_storage_service.dto.BookUpdateDto;
 import com.example.book_storage_service.exception.CustomHttpException;
 import com.example.book_storage_service.models.Book;
 import com.example.book_storage_service.mapper.BookMapper;
@@ -41,7 +41,7 @@ public class BookService {
         return bookRepository.findAll();
     }
 
-    public Book addBook(BookAddRequest book) {
+    public Book addBook(BookAddDto book) {
         if (bookRepository.existsByIsbn(book.getIsbn())) {
             throw new CustomHttpException("Book with ISBN " + book.getIsbn() + " already exists", HttpStatus.CONFLICT);
         }
@@ -57,7 +57,7 @@ public class BookService {
         return bookRepository.save(newBook);
     }
 
-    public Book editBook(Long id, BookEditRequest bookData) {
+    public Book editBook(Long id, BookUpdateDto bookData) {
         Optional<Book> existBook = bookRepository.findById(id);
         if (!existBook.isPresent()) throw new CustomHttpException("Book with id " + id + " not found", HttpStatus.NOT_FOUND);
         

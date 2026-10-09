@@ -23,8 +23,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.example.book_storage_service.dto.BookAddRequest;
-import com.example.book_storage_service.dto.BookEditRequest;
+import com.example.book_storage_service.dto.BookAddDto;
+import com.example.book_storage_service.dto.BookUpdateDto;
 import com.example.book_storage_service.models.Book;
 import com.example.book_storage_service.services.BookService;
 import com.example.book_storage_service.services.ProducerService;
@@ -160,7 +160,7 @@ class BookControllerTest {
             "author1"
         );
 
-        when(bookService.addBook(any(BookAddRequest.class))).thenReturn(returnedBook);
+        when(bookService.addBook(any(BookAddDto.class))).thenReturn(returnedBook);
 
         mockMvc.perform(post("/book")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -171,7 +171,7 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.status").value("200"))
                 .andExpect(jsonPath("$.message").value("Book added (id: 1)"));
 
-        verify(bookService, times(1)).addBook(any(BookAddRequest.class));
+        verify(bookService, times(1)).addBook(any(BookAddDto.class));
         verify(producerService, times(1)).sendBookId(BOOK_TOPIC, "1");
     }
 
@@ -186,7 +186,7 @@ class BookControllerTest {
             "author1"
         );
 
-        when(bookService.editBook(eq(1L), any(BookEditRequest.class))).thenReturn(returnedBook);
+        when(bookService.editBook(eq(1L), any(BookUpdateDto.class))).thenReturn(returnedBook);
 
         mockMvc.perform(put("/book/1")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -197,7 +197,7 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.status").value("200"))
                 .andExpect(jsonPath("$.message").value("Book with id 1 edited"));
 
-        verify(bookService, times(1)).editBook(eq(1L), any(BookEditRequest.class));
+        verify(bookService, times(1)).editBook(eq(1L), any(BookUpdateDto.class));
     }
 
     @Test
