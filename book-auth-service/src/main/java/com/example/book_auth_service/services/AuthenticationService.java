@@ -8,8 +8,11 @@ import org.springframework.stereotype.Service;
 
 import com.example.book_auth_service.dto.JwtAuthenticationResponse;
 import com.example.book_auth_service.dto.LoginRequest;
+import com.example.book_auth_service.dto.RefreshTokenRequest;
 import com.example.book_auth_service.models.Role;
 import com.example.book_auth_service.models.User;
+
+import io.jsonwebtoken.Claims;
 
 @Service
 public class AuthenticationService {
@@ -43,8 +46,10 @@ public class AuthenticationService {
 
         userService.addUser(user);
 
-        var jwt = jwtService.generateToken(user);
-        return new JwtAuthenticationResponse(jwt);
+
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        return new JwtAuthenticationResponse(accessToken, refreshToken);
     }
 
     /**
@@ -59,10 +64,23 @@ public class AuthenticationService {
                 request.getPassword()
         ));
 
-        var user = userService
-                .loadUserByUsername(request.getUsername());
+        var user = userService.userByName(request.getUsername());
 
-        var jwt = jwtService.generateToken(user);
-        return new JwtAuthenticationResponse(jwt);
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        return new JwtAuthenticationResponse(accessToken, refreshToken);
+    }
+
+    public JwtAuthenticationResponse refresh(RefreshTokenRequest request) {
+        Claims claims = jwtService.validateRefreshToken(request.getToken());
+
+        String username = claims.getSubject();
+
+        User user = userService.userByName(username);
+
+        String newAccessToken = jwtService.generateAccessToken(user);
+        String newRefreshToken = jwtService.generateRefreshToken(user);
+
+        return new JwtAuthenticationResponse(newAccessToken, newRefreshToken);
     }
 }

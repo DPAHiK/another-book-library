@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.book_auth_service.dto.JwtAuthenticationResponse;
 import com.example.book_auth_service.dto.LoginRequest;
+import com.example.book_auth_service.dto.RefreshTokenRequest;
 import com.example.book_auth_service.services.AuthenticationService;
 
 import jakarta.validation.Valid;
@@ -27,6 +28,11 @@ public class AuthController {
     @PostMapping("/signin")
     public JwtAuthenticationResponse signIn(@RequestBody @Valid LoginRequest request) {
         return authenticationService.signIn(request);
+    }
+
+    @PostMapping("/refresh")
+    public JwtAuthenticationResponse refresh(@RequestBody RefreshTokenRequest request) {
+        return authenticationService.refresh(request);
     }
 
 }

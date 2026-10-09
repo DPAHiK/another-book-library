@@ -14,12 +14,12 @@ import io.jsonwebtoken.security.Keys;
 @Configuration
 public class JwtConfig {
 
-    @Value("${token.signing.key}")
-    private String jwtSigningKey;
+    @Value("${access.signing.key}")
+    private String accessSigningKey;
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSigningKey);
+        byte[] keyBytes = Decoders.BASE64.decode(accessSigningKey);
 
         SecretKey key = Keys.hmacShaKeyFor(keyBytes);
 

@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,8 +22,35 @@ import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtService {
-    @Value("${token.signing.key}")
-    private String jwtSigningKey;
+    @Value("${access.signing.key}")
+    private String accessSigningKey;
+
+    @Value("${refresh.signing.key}")
+    private String refreshSigningKey;
+
+    @Value("${jwt.access.expiration}")
+    private long accessExpiration;
+
+    @Value("${jwt.refresh.expiration}")
+    private long refreshExpiration;
+
+    public String generateAccessToken(User user) {
+        return generateToken(
+                user,
+                accessSigningKey,
+                accessExpiration,
+                "access"
+        );
+    }
+
+    public String generateRefreshToken(User user) {
+        return generateToken(
+                user,
+                refreshSigningKey,
+                refreshExpiration,
+                "refresh"
+        );
+    }
 
     /**
      * Извлечение имени пользователя из токена
@@ -34,19 +62,42 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    /**
-     * Генерация токена
-     *
-     * @param userDetails данные пользователя
-     * @return токен
-     */
-    public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        if (userDetails instanceof User customUserDetails) {
-            claims.put("id", customUserDetails.getId());
-            claims.put("role", customUserDetails.getRole());
+    private String generateToken(
+            User user,
+            String encodedSecret,
+            long expiration,
+            String tokenType
+    ) {
+        Date now = new Date();
+
+        return Jwts.builder()
+                .subject(user.getUsername())
+                .claim("id", user.getId())
+                .claim("role", user.getRole())
+                .claim("token_type", tokenType)
+                .issuedAt(now)
+                .expiration(new Date(now.getTime() + expiration))
+                .signWith(getSigningKey(encodedSecret), Jwts.SIG.HS256)
+                .compact();
+    }
+
+    private SecretKey getSigningKey(String encodedSecret) {
+        byte[] keyBytes = Decoders.BASE64.decode(encodedSecret);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public Claims validateRefreshToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(getSigningKey(refreshSigningKey))
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        if (!"refresh".equals(claims.get("token_type", String.class))) {
+            throw new IllegalArgumentException("Invalid token type");
         }
-        return generateToken(claims, userDetails);
+
+        return claims;
     }
 
     /**
@@ -72,20 +123,6 @@ public class JwtService {
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
         final Claims claims = extractAllClaims(token);
         return claimsResolvers.apply(claims);
-    }
-
-    /**
-     * Генерация токена
-     *
-     * @param extraClaims дополнительные данные
-     * @param userDetails данные пользователя
-     * @return токен
-     */
-    private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 100000 * 60 * 24))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
     }
 
     /**
@@ -125,7 +162,7 @@ public class JwtService {
      * @return ключ
      */
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSigningKey);
+        byte[] keyBytes = Decoders.BASE64.decode(accessSigningKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
