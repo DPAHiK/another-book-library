@@ -11,6 +11,7 @@ import com.example.book_auth_service.dto.LoginRequest;
 import com.example.book_auth_service.dto.RefreshTokenRequest;
 import com.example.book_auth_service.models.Role;
 import com.example.book_auth_service.models.User;
+import com.example.book_auth_service.dto.RotatedRefreshToken;
 
 import io.jsonwebtoken.Claims;
 
@@ -23,19 +24,15 @@ public class AuthenticationService {
     private JwtService jwtService;
 
     @Autowired
+    private RefreshTokenService refreshTokenService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private AuthenticationManager authenticationManager;
 
 
-
-    /**
-     * Регистрация пользователя
-     *
-     * @param request данные пользователя
-     * @return токен
-     */
     public JwtAuthenticationResponse signUp(LoginRequest request) {
 
         var user = new User.builder()
@@ -48,16 +45,10 @@ public class AuthenticationService {
 
 
         String accessToken = jwtService.generateAccessToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
+        String refreshToken = refreshTokenService.createToken(user);
         return new JwtAuthenticationResponse(accessToken, refreshToken);
     }
 
-    /**
-     * Аутентификация пользователя
-     *
-     * @param request данные пользователя
-     * @return токен
-     */
     public JwtAuthenticationResponse signIn(LoginRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 request.getUsername(),
@@ -67,20 +58,20 @@ public class AuthenticationService {
         var user = userService.userByName(request.getUsername());
 
         String accessToken = jwtService.generateAccessToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
+        String refreshToken = refreshTokenService.createToken(user);
         return new JwtAuthenticationResponse(accessToken, refreshToken);
     }
 
-    public JwtAuthenticationResponse refresh(RefreshTokenRequest request) {
-        Claims claims = jwtService.validateRefreshToken(request.getToken());
+public JwtAuthenticationResponse refresh(RefreshTokenRequest request) {
+        String rawRefreshToken = request.getToken();
+        RotatedRefreshToken rotated = refreshTokenService.rotateToken(rawRefreshToken);
 
-        String username = claims.getSubject();
-
-        User user = userService.userByName(username);
-
+        User user = rotated.user();
         String newAccessToken = jwtService.generateAccessToken(user);
-        String newRefreshToken = jwtService.generateRefreshToken(user);
 
-        return new JwtAuthenticationResponse(newAccessToken, newRefreshToken);
+        return new JwtAuthenticationResponse(
+                newAccessToken,
+                rotated.refreshToken()
+        );
     }
 }

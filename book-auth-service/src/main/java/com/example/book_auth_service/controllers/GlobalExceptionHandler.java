@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.example.book_auth_service.exception.CustomHttpException;
 
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
