@@ -30,13 +30,16 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/auth/signup", "/auth/signin").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session ->
                 session.sessionCreationPolicy(
                     SessionCreationPolicy.STATELESS
                 )
+            )
+            .oauth2ResourceServer(oauth2 ->
+                oauth2.jwt(jwt -> {})
             );
 
         return http.build();

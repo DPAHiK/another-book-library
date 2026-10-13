@@ -43,7 +43,6 @@ public class AuthenticationService {
 
         userService.addUser(user);
 
-
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = refreshTokenService.createToken(user);
         return new JwtAuthenticationResponse(accessToken, refreshToken);
@@ -62,7 +61,7 @@ public class AuthenticationService {
         return new JwtAuthenticationResponse(accessToken, refreshToken);
     }
 
-public JwtAuthenticationResponse refresh(RefreshTokenRequest request) {
+    public JwtAuthenticationResponse refresh(RefreshTokenRequest request) {
         String rawRefreshToken = request.getToken();
         RotatedRefreshToken rotated = refreshTokenService.rotateToken(rawRefreshToken);
 

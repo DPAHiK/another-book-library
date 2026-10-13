@@ -82,4 +82,16 @@ public class RefreshTokenService {
 
         return new RotatedRefreshToken(user, newRawToken);
     }
+
+    @Transactional
+    public void revokeToken(String rawToken) {
+        String tokenHash = hashToken(rawToken);
+
+        repository.findByToken(tokenHash).ifPresent(token -> {
+            if (token.getRevokedAt() == null) {
+                token.setRevokedAt(Instant.now());
+                repository.save(token);
+            }
+        });
+    }
 }
